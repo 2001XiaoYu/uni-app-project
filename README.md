@@ -96,3 +96,5 @@ npm run dev:h5
 ├── tsconfig.json              # typescript 配置
 └── vite.config.ts             # vite 配置
 ```
+# uni-app-project
+uni-app练手项目
