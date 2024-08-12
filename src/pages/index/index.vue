@@ -6,6 +6,7 @@ import { ref } from 'vue'
 import CustomNavbar from './components/CustomNavbar.vue'
 import CategoryPanel from './components/CategoryPanel.vue'
 
+//获取轮播图数据
 const bannerList = ref<BannerItem[]>([])
 const getHomeBannerData = async () => {
   const res = await getHomeBannerAPI()
@@ -13,8 +14,15 @@ const getHomeBannerData = async () => {
   bannerList.value = res.result
 }
 
+//获取前台分类数据
+const getHomeCategoryData = async () => {
+  const res = await getHomeCategoryData()
+  console.log(res)
+}
+
 onLoad(() => {
   getHomeBannerData()
+  getHomeCategoryData()
 })
 </script>
 
