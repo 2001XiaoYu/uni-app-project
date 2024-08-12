@@ -20,10 +20,12 @@
       "@uni-helper/uni-ui-types"
     ],
     "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "vueCompilerOptions": {
     // experimentalRuntimeMode 已废弃，现调整为 nativeTags，请升级 Volar 插件至最新版本
-    // "nativeTags": ["block", "component", "template", "slot"]
     "plugins": [
       "@uni-helper/uni-app-types/volar-plugin"
     ]
