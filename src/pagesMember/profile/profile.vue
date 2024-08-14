@@ -2,6 +2,7 @@
 import type { ProfileDetail } from '@/types/member'
 import { getMemberProfileAPI } from '@/services/profile'
 import { putMemberProfileAPI } from '@/services/profile'
+import { useMemberStore } from '@/stores'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
@@ -19,6 +20,7 @@ onLoad(() => {
   getMemberProfileData()
 })
 
+const memberStore = useMemberStore()
 // 修改头像
 const onAvatarChange = () => {
   // 调用拍照/选择图片
@@ -37,8 +39,11 @@ const onAvatarChange = () => {
         success: (res) => {
           if (res.statusCode === 200) {
             // 提取头像
-            const { avatar } = JSON.parse(res.data).result
+            const avatar = JSON.parse(res.data).result.avatar
+            // 个人信息页数据更新
             profile.value!.avatar = avatar
+            // Stores 头像更新
+            memberStore.profile!.avatar = avatar
             uni.showToast({ icon: 'success', title: '更新成功' })
           } else {
             uni.showToast({ icon: 'error', title: '接口错误' })
@@ -54,7 +59,12 @@ const onSubmit = async () => {
   const res = await putMemberProfileAPI({
     nickname: profile.value?.nickname,
   })
+  // 更新 Store 昵称
+  memberStore.profile!.nickname = res.result.nickname
   uni.showToast({ icon: 'success', title: '保存成功' })
+  setTimeout(() => {
+    uni.navigateBack()
+  }, 500)
 }
 </script>
 
