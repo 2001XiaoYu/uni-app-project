@@ -11,7 +11,7 @@ const getMemberAddressData = async () => {
   addressList.value = res.result
 }
 
-// 初始化调用
+// 每次显示页面调用
 onShow(() => {
   getMemberAddressData()
 })
