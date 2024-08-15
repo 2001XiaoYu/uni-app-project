@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getGoodsByIdAPI } from '@/services/goods'
+import { postMemberCartAPI } from '@/services/cart'
 import type {
   SkuPopupLocaldata,
   SkuPopupInstance,
@@ -107,6 +108,12 @@ const skuPopupRef = ref<SkuPopupInstance>()
 const selectArrText = computed(() => {
   return skuPopupRef.value?.selectArr?.join(' ').trim() || '请选择商品规格'
 })
+// 加入购物车事件
+const onAddCart = async (ev: SkuPopupEvent) => {
+  await postMemberCartAPI({ skuId: ev._id, count: ev.buy_num })
+  uni.showToast({ title: '添加成功' })
+  isShowSku.value = false
+}
 </script>
 
 <template>
@@ -118,6 +125,7 @@ const selectArrText = computed(() => {
     add-cart-background-color="#FFA868"
     buy-now-background-color="#27BA9B"
     ref="skuPopupRef"
+    @add-cart="onAddCart"
     :actived-style="{ color: '#27BA9B', borderColor: '#27BA9B', backgroundColor: '#E9F8F5' }"
   />
   <scroll-view scroll-y class="viewport">
@@ -151,7 +159,7 @@ const selectArrText = computed(() => {
       <view class="action">
         <view @tap="openSkuPopup(SkuMode.Both)" class="item arrow">
           <text class="label">选择</text>
-          <text class="text ellipsis"> 请选择商品规格 </text>
+          <text class="text ellipsis">{{ selectArrText }}</text>
         </view>
         <view @tap="openPopup('address')" class="item arrow">
           <text class="label">送至</text>
