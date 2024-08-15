@@ -4,7 +4,8 @@ import { postMemberCartAPI } from '@/services/cart'
 import type {
   SkuPopupLocaldata,
   SkuPopupInstance,
-} from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup.vue'
+  SkuPopupEvent,
+} from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref, computed } from 'vue'
 import type { GoodsResult } from '@/types/goods'
