@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useMemberStore } from '@/stores'
 import type { CartItem } from '@/types/cart'
+import { useGuessList } from '@/composables'
 import {
   getMemberCartAPI,
   deleteMemberCartAPI,
@@ -98,10 +99,20 @@ const gotoPayment = () => {
   // 跳转到结算页面
   uni.showToast({ title: '等待完成' })
 }
+
+// 接收外部传入的样式(这里主要给cart2做底部操作栏的适配)
+defineProps({
+  toolbarStyle: {
+    type: Object,
+    default: () => ({}),
+  },
+})
+
+const { guessRef, onScrolltolower } = useGuessList()
 </script>
 
 <template>
-  <scroll-view scroll-y class="scroll-view">
+  <scroll-view @scrolltolower="onScrolltolower" scroll-y class="scroll-view">
     <!-- 已登录: 显示购物车 -->
     <template v-if="memberStore.profile">
       <!-- 购物车列表 -->
@@ -164,7 +175,7 @@ const gotoPayment = () => {
         </navigator>
       </view>
       <!-- 吸底工具栏 -->
-      <view class="toolbar">
+      <view class="toolbar" :style="toolbarStyle">
         <text @tap="onChangeSelectedAll" class="all" :class="{ checked: isSelectedAll }">全选</text>
         <text class="text">合计:</text>
         <text class="amount">{{ selectedCartListMoney }}</text>
