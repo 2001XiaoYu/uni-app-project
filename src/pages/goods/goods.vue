@@ -115,6 +115,11 @@ const onAddCart = async (ev: SkuPopupEvent) => {
   uni.showToast({ title: '添加成功' })
   isShowSku.value = false
 }
+
+// 立即购买
+const onBuyNow = (ev: SkuPopupEvent) => {
+  uni.navigateTo({ url: `/pageOrder/create/create?skuId=$${ev._id}&count=${ev.buy_num}` })
+}
 </script>
 
 <template>
@@ -127,6 +132,7 @@ const onAddCart = async (ev: SkuPopupEvent) => {
     buy-now-background-color="#27BA9B"
     ref="skuPopupRef"
     @add-cart="onAddCart"
+    @buy-now="onBuyNow"
     :actived-style="{ color: '#27BA9B', borderColor: '#27BA9B', backgroundColor: '#E9F8F5' }"
   />
   <scroll-view scroll-y class="viewport">
