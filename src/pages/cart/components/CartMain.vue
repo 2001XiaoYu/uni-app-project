@@ -97,7 +97,7 @@ const gotoPayment = () => {
     return uni.showToast({ icon: 'none', title: '请选择商品' })
   }
   // 跳转到结算页面
-  uni.showToast({ title: '等待完成' })
+  uni.navigateTo({ url: '/pagesOrder/create/create' })
 }
 
 // 接收外部传入的样式(这里主要给cart2做底部操作栏的适配)
