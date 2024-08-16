@@ -118,7 +118,7 @@ const onAddCart = async (ev: SkuPopupEvent) => {
 
 // 立即购买
 const onBuyNow = (ev: SkuPopupEvent) => {
-  uni.navigateTo({ url: `/pageOrder/create/create?skuId=$${ev._id}&count=${ev.buy_num}` })
+  uni.navigateTo({ url: `/pagesOrder/create/create?skuId=${ev._id}&count=${ev.buy_num}` })
 }
 </script>
 
