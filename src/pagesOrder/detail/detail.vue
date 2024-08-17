@@ -5,6 +5,7 @@ import { onReady, onLoad } from '@dcloudio/uni-app'
 import { getMemberOrderByIdAPI } from '@/services/order'
 import type { OrderResult } from '@/types/order'
 import { OrderState, orderStateList } from '@/services/constants'
+import { getPayMockAPI, getPayWxPayMiniPayAPI } from '@/services/pay'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -84,6 +85,20 @@ const onTimeup = () => {
   // 修改订单状态为已取消
   order.value!.orderState = OrderState.YiQuXiao
 }
+
+// 订单支付
+const onOrderPay = async () => {
+  if (import.meta.env.DEV) {
+    // 开发环境模拟支付
+    await getPayMockAPI({ orderId: query.id })
+  } else {
+    // 正式环境支付
+    const res = await getPayWxPayMiniPayAPI({ orderId: query.id })
+    wx.requestPayment(res.result)
+  }
+  // 关闭当前页，再跳转支付结果页
+  uni.redirectTo({ url: `/pagesOrder/payment/payment?id=${query.id}` })
+}
 </script>
 
 <template>
@@ -119,7 +134,7 @@ const onTimeup = () => {
               @timeup="onTimeup"
             />
           </view>
-          <view class="button">去支付</view>
+          <view class="button" @tap="onOrderPay">去支付</view>
         </template>
         <!-- 其他订单状态:展示再次购买按钮 -->
         <template v-else>
