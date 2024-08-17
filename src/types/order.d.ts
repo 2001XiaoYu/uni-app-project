@@ -1,4 +1,4 @@
-import { OrderState } from '@/services/constants'
+import type { OrderState } from '@/services/constants'
 import type { AddressItem } from './address'
 
 /** 获取预付订单 返回信息 */
