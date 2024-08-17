@@ -2,8 +2,13 @@
 import { useGuessList } from '@/composables'
 import { ref } from 'vue'
 import { onReady, onLoad } from '@dcloudio/uni-app'
-import { getMemberOrderByIdAPI } from '@/services/order'
-import type { OrderResult } from '@/types/order'
+import {
+  getMemberOrderByIdAPI,
+  getMemberOrderLogisticsByIdAPI,
+  getMemberOrderConsignmentByIdAPI,
+  putMemberOrderReceiptByIdAPI,
+} from '@/services/order'
+import type { OrderResult, LogisticItem } from '@/types/order'
 import { OrderState, orderStateList } from '@/services/constants'
 import { getPayMockAPI, getPayWxPayMiniPayAPI } from '@/services/pay'
 
@@ -74,6 +79,21 @@ const order = ref<OrderResult>()
 const getMemberOrderByIdData = async () => {
   const res = await getMemberOrderByIdAPI(query.id)
   order.value = res.result
+  if (
+    [OrderState.DaiShouHuo, OrderState.DaiPingJia, OrderState.YiWanCheng].includes(
+      order.value.orderState,
+    )
+  ) {
+    getMemberOrderLogisticsByIdData()
+  }
+}
+
+// 获取物流信息
+const logisticList = ref<LogisticItem[]>([])
+const getMemberOrderLogisticsByIdData = async () => {
+  const res = await getMemberOrderLogisticsByIdAPI(query.id)
+  // console.log(res)
+  logisticList.value = res.result.list
 }
 
 onLoad(() => {
@@ -98,6 +118,34 @@ const onOrderPay = async () => {
   }
   // 关闭当前页，再跳转支付结果页
   uni.redirectTo({ url: `/pagesOrder/payment/payment?id=${query.id}` })
+}
+
+// 是否为开发环境
+const isDev = import.meta.env.DEV
+// 模拟发货
+const onOrderSend = async () => {
+  if (isDev) {
+    await getMemberOrderConsignmentByIdAPI(query.id)
+    uni.showToast({ icon: 'success', title: '模拟发货完成' })
+    // 主动更新订单状态
+    order.value!.orderState = OrderState.DaiShouHuo
+  }
+}
+
+// 确认收货
+const onOrderConfirm = () => {
+  // 二次确认弹窗
+  uni.showModal({
+    content: '为保障您的权益，请收到货并确认无误后，再确认收货',
+    success: async (success) => {
+      if (success.confirm) {
+        const res = await putMemberOrderReceiptByIdAPI(query.id)
+        uni.showToast({ icon: 'success', title: '确认收货成功' })
+        // 更新订单状态
+        order.value = res.result
+      }
+    },
+  })
 }
 </script>
 
@@ -149,23 +197,37 @@ const onOrderPay = async () => {
               再次购买
             </navigator>
             <!-- 待发货状态：模拟发货,开发期间使用,用于修改订单状态为已发货 -->
-            <view v-if="false" class="button"> 模拟发货 </view>
+            <view
+              v-if="isDev && order.orderState === OrderState.DaiFaHuo"
+              @tap="onOrderSend"
+              class="button"
+            >
+              模拟发货
+            </view>
+            <!-- 待收货状态：展示确认收获按钮 -->
+            <view
+              v-if="order.orderState === OrderState.DaiShouHuo"
+              @tap="onOrderConfirm"
+              class="button"
+            >
+              确认收货
+            </view>
           </view>
         </template>
       </view>
       <!-- 配送状态 -->
       <view class="shipment">
         <!-- 订单物流信息 -->
-        <view v-for="item in 1" :key="item" class="item">
+        <view v-for="item in logisticList" :key="item.id" class="item">
           <view class="message">
-            您已在广州市天河区黑马程序员完成取件，感谢使用菜鸟驿站，期待再次为您服务。
+            {{ item.text }}
           </view>
-          <view class="date"> 2023-04-14 13:14:20 </view>
+          <view class="date">{{ item.time }}</view>
         </view>
         <!-- 用户收货地址 -->
         <view class="locate">
-          <view class="user"> 张三 13333333333 </view>
-          <view class="address"> 广东省 广州市 天河区 黑马程序员 </view>
+          <view class="user">{{ order.receiverContact }} {{ order.receiverMobile }} </view>
+          <view class="address">{{ order.receiverAddress }}</view>
         </view>
       </view>
 
