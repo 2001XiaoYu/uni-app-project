@@ -42,9 +42,11 @@ const onOrderPay = async (id: string) => {
     // 开发环境模拟支付
     await getPayMockAPI({ orderId: id })
   } else {
+    // #ifdef MP-WEIXIN
     // 正式环境支付
     const res = await getPayWxPayMiniPayAPI({ orderId: id })
     wx.requestPayment(res.result)
+    // #endif
   }
   // 成功的提示
   uni.showToast({ title: '支付成功' })

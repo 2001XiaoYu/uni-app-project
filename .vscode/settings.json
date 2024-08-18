@@ -17,6 +17,7 @@
     "persistedstate",
     "pinia",
     "Refresherrefresh",
-    "Scrolltolower"
+    "Scrolltolower",
+    "WEIXIN"
   ]
 }
