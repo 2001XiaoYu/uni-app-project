@@ -258,6 +258,20 @@ const onBuyNow = (ev: SkuPopupEvent) => {
   flex: 1;
 }
 
+.uni-swiper-slide-frame {
+  image {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.content {
+  image {
+    width: 100%;
+    height: 100%;
+  }
+}
+
 /* #endif */
 page {
   height: 100%;
