@@ -8,3 +8,9 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
 <template>
   <CartMain :toolbarStyle="{ paddingBottom: safeAreaInsets?.bottom + 'px' }" />
 </template>
+
+<style lang="scss">
+page {
+  height: 100%;
+}
+</style>
