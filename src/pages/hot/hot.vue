@@ -75,7 +75,7 @@ const onScrolltolower = async () => {
   <view class="viewport">
     <!-- 推荐封面图 -->
     <view class="cover">
-      <image :src="bannerPicture"> </image>
+      <image :src="bannerPicture"></image>
     </view>
     <!-- 推荐选项 -->
     <view class="tabs">
@@ -140,6 +140,14 @@ page {
   position: absolute;
   left: 0;
   top: 0;
+
+  /* #ifdef H5 || APP-PLUS */
+  image {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* #endif */
 }
 
 .scroll-view {
