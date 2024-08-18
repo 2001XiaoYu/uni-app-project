@@ -3,6 +3,8 @@ import { onMounted, ref } from 'vue'
 import { getMemberOrderAPI } from '@/services/order'
 import type { OrderListParams, OrderItem } from '@/types/order'
 import { orderStateList, OrderState } from '@/services/constants'
+import { getPayMockAPI, getPayWxPayMiniPayAPI } from '@/services/pay'
+import ListSkeleton from './ListSkeleton'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -15,7 +17,7 @@ const props = defineProps<{
 // 请求参数
 const queryParams: OrderListParams = {
   page: 1,
-  pageSize: 5,
+  pageSize: 3,
   orderState: props.orderState,
 }
 
@@ -26,13 +28,33 @@ const getMemberOrderData = async () => {
   orderList.value = res.result.items
 }
 
-onMounted(() => {
-  getMemberOrderData()
+// 是否数据加载完毕
+const isFinish = ref(false)
+// 页面加载
+onMounted(async () => {
+  await getMemberOrderData()
+  isFinish.value = true
 })
+
+// 订单支付
+const onOrderPay = async (id: string) => {
+  if (import.meta.env.DEV) {
+    // 开发环境模拟支付
+    await getPayMockAPI({ orderId: id })
+  } else {
+    // 正式环境支付
+    const res = await getPayWxPayMiniPayAPI({ orderId: id })
+    wx.requestPayment(res.result)
+  }
+  // 成功的提示
+  uni.showToast({ title: '支付成功' })
+  orderList.value.find((v) => v.id === id)
+  order!.orderState = OrderState.DaiFaHuo
+}
 </script>
 
 <template>
-  <scroll-view scroll-y class="orders">
+  <scroll-view scroll-y class="orders" v-if="isFinish">
     <view class="card" v-for="order in orderList" :key="order.id">
       <!-- 订单信息 -->
       <view class="status">
@@ -68,7 +90,7 @@ onMounted(() => {
       <view class="action">
         <!-- 待付款状态：显示去支付按钮 -->
         <template v-if="order.orderState === OrderState.DaiFuKuan">
-          <view class="button primary">去支付</view>
+          <view class="button primary" @tap="onOrderPay(order.id)">去支付</view>
         </template>
         <template v-else>
           <navigator
@@ -90,6 +112,7 @@ onMounted(() => {
       {{ true ? '没有更多数据~' : '正在加载...' }}
     </view>
   </scroll-view>
+  <ListSkeleton v-else />
 </template>
 <style lang="scss">
 .orders {
